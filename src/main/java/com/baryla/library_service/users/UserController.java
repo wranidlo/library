@@ -1,6 +1,5 @@
 package com.baryla.library_service.users;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -14,6 +13,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
+@RequestMapping("/library")
 public class UserController {
     private final UserRepository userRepository;
     private final UserModelAssembler userModelAssembler;
@@ -84,12 +84,11 @@ public class UserController {
 
         if (updateUser.getAccountType() == AccountType.FREE){
             updateUser.setAccountType(AccountType.PREMIUM);
-            return ResponseEntity.ok(userModelAssembler.toModel(userRepository.save(updateUser)));
         }
         else {
             updateUser.setAccountType(AccountType.FREE);
-            return ResponseEntity.ok(userModelAssembler.toModel(userRepository.save(updateUser)));
         }
+        return ResponseEntity.ok(userModelAssembler.toModel(userRepository.save(updateUser)));
     }
 
     // Delete one user

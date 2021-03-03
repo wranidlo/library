@@ -1,5 +1,7 @@
 package com.baryla.library_service.users;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,7 +14,9 @@ public class User {
     private @Id
     @GeneratedValue
     Long id;
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
     private AccountType accountType;
 
