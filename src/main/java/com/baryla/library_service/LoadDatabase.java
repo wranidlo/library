@@ -23,10 +23,9 @@ public class LoadDatabase {
             userRepository.save(new User("Steve", "Stevens", AccountType.FREE));
             userRepository.findAll().forEach(user -> log.info("Preloaded " + user));
 
-            bookRepository.save(new Book("Tai-Pan", "James Clavell"));
-            bookRepository.save(new Book("Quo vadis", "Henryk Sienkiewicz"));
-            bookRepository.save(new Book("Quo vadis", "Henryk Sienkiewicz"));
-            bookRepository.save(new Book("Ogniem i mieczem", "Henryk Sienkiewicz"));
+            bookRepository.save(new Book("Tai-Pan", "James Clavell",2001));
+            bookRepository.save(new Book("Quo vadis", "Henryk Sienkiewicz",1999));
+            bookRepository.save(new Book("Ogniem i mieczem", "Henryk Sienkiewicz",2006));
             bookRepository.findAll().forEach(book -> log.info("Preloaded " + book));
 
         };

@@ -8,25 +8,21 @@ import java.util.Objects;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String title;
     private String author;
-    private long borrowedBy;
+    private Integer year;
+
 
     public Book() {
-        this.borrowedBy = 0;
     }
 
-    public Book(String title, String author) {
+    public Book(String title, String author, Integer year) {
         this.title = title;
         this.author = author;
-        this.borrowedBy = 0;
-    }
-
-    public long getBorrowedBy() {
-        return borrowedBy;
+        this.year = year;
     }
 
     public long getId() {
@@ -41,6 +37,10 @@ public class Book {
         return author;
     }
 
+    public Integer getYear() {
+        return year;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -53,8 +53,8 @@ public class Book {
         this.author = author;
     }
 
-    public void setBorrowedBy(long borrowedBy) {
-        this.borrowedBy = borrowedBy;
+    public void setYear(Integer year) {
+        this.year = year;
     }
 
     @Override
@@ -62,12 +62,12 @@ public class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return title.equals(book.title) && author.equals(book.author);
+        return Objects.equals(title, book.title) && Objects.equals(author, book.author) && Objects.equals(year, book.year);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, author);
+        return Objects.hash(title, author, year);
     }
 
     @Override
@@ -76,6 +76,7 @@ public class Book {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
+                ", year=" + year +
                 '}';
     }
 }
