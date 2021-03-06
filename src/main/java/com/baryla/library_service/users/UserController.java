@@ -1,69 +1,36 @@
 package com.baryla.library_service.users;
 
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-@RestController
-@RequestMapping("/library")
+@Controller
 public class UserController {
     private final UserRepository userRepository;
-    private final UserModelAssembler userModelAssembler;
 
-    public UserController(UserRepository userRepository, UserModelAssembler userModelAssembler) {
+    public UserController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userModelAssembler = userModelAssembler;
     }
 
-    // Get all users
-    @GetMapping("/users")
-    CollectionModel<EntityModel<User>> all() {
-
-        List<EntityModel<User>> users = userRepository.findAll().stream()
-                .map(userModelAssembler::toModel)
-                .collect(Collectors.toList());
-
-        return CollectionModel.of(users, linkTo(methodOn(UserController.class).all()).withSelfRel());
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
     }
 
-    // Get one user
-    @GetMapping("/users/{id}")
-    EntityModel<User> one(@PathVariable Long id) {
-
+    public User getOneUser(Long id){
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-
-        return userModelAssembler.toModel(user);
+        return user;
     }
 
-    //Add one free user
-    @PostMapping("/users/free")
-    ResponseEntity<?> newFreeUser(@RequestBody User newUser){
-        newUser.setAccountType(AccountType.FREE);
-        EntityModel<User> userEntityModel = userModelAssembler.toModel(userRepository.save(newUser));
-        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+    public User createNewUser(User newUser, AccountType accountType){
+        newUser.setAccountType(accountType);
+        return userRepository.save(newUser);
     }
 
-    //Add one premium user
-    @PostMapping("/users/premium")
-    ResponseEntity<?> newPremiumUser(@RequestBody User newUser){
-        newUser.setAccountType(AccountType.PREMIUM);
-        EntityModel<User> userEntityModel = userModelAssembler.toModel(userRepository.save(newUser));
-        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
-    }
-
-    // Update one user
-    @PutMapping("/users/update/{id}")
-    ResponseEntity<?> updateUser(@RequestBody User newUser, @PathVariable Long id){
-        User updateUser = userRepository.findById(id)
+    public User updateUser(User newUser, Long id){
+        User updatedUser = userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(newUser.getFirstName());
                     user.setLastName(newUser.getLastName());
@@ -73,13 +40,10 @@ public class UserController {
                     newUser.setId(id);
                     return userRepository.save(newUser);
                 });
-        EntityModel<User> userEntityModel = userModelAssembler.toModel(updateUser);
-        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+        return updatedUser;
     }
 
-    // Change account type
-    @PutMapping("/users/change/{id}")
-    ResponseEntity<?> changeUserAccountType(@PathVariable Long id){
+    public User changeUserAccountType(Long id){
         User updateUser = userRepository.findById(id).orElseThrow(()-> new UserNotFoundException(id));
 
         if (updateUser.getAccountType() == AccountType.FREE){
@@ -88,22 +52,15 @@ public class UserController {
         else {
             updateUser.setAccountType(AccountType.FREE);
         }
-        return ResponseEntity.ok(userModelAssembler.toModel(userRepository.save(updateUser)));
+        return userRepository.save(updateUser);
     }
 
-    // Delete one user
-    @DeleteMapping("/users/{id}")
-    ResponseEntity<?> deleteUser(@PathVariable Long id){
+    public void deleteOneUser(Long id){
         userRepository.findById(id).orElseThrow(()->new UserNotFoundException(id));
         userRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 
-    // Users with account type
-    @GetMapping("/users/account")
-    CollectionModel<EntityModel<User>> getUsersWithAccountType(@RequestParam(value = "type") AccountType type){
-        List<EntityModel<User>> entityModelList = userRepository.getUsersWithAccountType(type).stream().
-                map(userModelAssembler::toModel).collect(Collectors.toList());
-        return CollectionModel.of(entityModelList, linkTo(methodOn(UserController.class).getUsersWithAccountType(type)).withSelfRel());
+    public List<User> getUsersWithAccount(AccountType accountType){
+        return userRepository.getUsersWithAccountType(accountType);
     }
 }
