@@ -35,7 +35,7 @@ public class TestWithMockMvc {
     @Test
     public void testGetAllUsers() throws Exception {
         this.mockMvc.perform(get("/library/users")).andDo(print()).andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.users").isArray());
+                .andExpect(jsonPath("$._embedded.users").isNotEmpty());
     }
 
 }
